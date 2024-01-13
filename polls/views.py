@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.urls import reverse
+from django.db.models import F
 
 # There’s also a get_list_or_404() function, which works just as get_object_or_404()
 # except using filter() instead of get(). It raises Http404 if the list is empty
@@ -39,6 +40,9 @@ def vote(request, question_id):
                 "error_message": "You didn't select a choice.",
             },
             )
-    selected_choice.votes += 1
+    # selected_choice.votes += 1
+    # Use F() to increment the votes atomically to avoid race conditions,
+    # ensuring that each vote is counted correctly, even in a multi-user environment
+    selected_choice.votes = F('votes') + 1
     selected_choice.save()
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
