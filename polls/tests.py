@@ -127,3 +127,25 @@ class QuestionDetailViewTests(TestCase):
         url = reverse("polls:detail", args=(past_question.id,))
         response = self.client.get(url)
         self.assertContains(response, past_question.question_text)
+
+class QuestionResultsViewTests(TestCase):
+    """Subclass of django.test.TestCase for testing ResultsView."""
+    def test_future_results_view(self):
+        """
+        The results view of a question with a pub_date in the future
+        returns a 404 not found error.
+        """
+        future_question = create_question(question_text="Future Question.", days=10)
+        url = reverse("polls:results", args=(future_question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_past_results_view(self):
+        """
+        The results view of a question with a pub_date in the past
+        displays the question's results view
+        """
+        past_question = create_question(question_text="Past Question", days=-10)
+        url = reverse("polls:results", args=(past_question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
