@@ -9,10 +9,8 @@ from django.utils import timezone
 # There’s also a get_list_or_404() function, which works just as get_object_or_404()
 # except using filter() instead of get(). It raises Http404 if the list is empty
 
-# from .models import Question
 from .models import Question, Choice
 
-# Create your views here.
 class IndexView(generic.ListView):
     """Class utilizing ListView generic view."""
     template_name = "polls/index.html"
@@ -20,7 +18,10 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         """Return the last five published questions."""
-        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:5]
+        return Question.objects.filter(
+            pub_date__lte=timezone.now(),
+            choice__isnull=False,
+            ).distinct().order_by("-pub_date")[:5]
 
 class DetailView(generic.DetailView):
     """Class utilizing DetailView generic view."""
@@ -31,7 +32,10 @@ class DetailView(generic.DetailView):
         """
         Excludes any questions that aren't published yet.
         """
-        return Question.objects.filter(pub_date__lte=timezone.now())
+        return Question.objects.filter(
+            pub_date__lte=timezone.now(),
+            choice__isnull=False,
+            )
 
 class ResultsView(generic.DetailView):
     """Class utilizing DetailView generic view."""
@@ -42,7 +46,10 @@ class ResultsView(generic.DetailView):
         """
         Excludes any questions that aren't published yet.
         """
-        return Question.objects.filter(pub_date__lte=timezone.now())
+        return Question.objects.filter(
+            pub_date__lte=timezone.now(),
+            choice__isnull=False,
+            )
 
 def vote(request, question_id):
     """Function for voting a question."""
