@@ -35,7 +35,7 @@ class DetailView(generic.DetailView):
         return Question.objects.filter(
             pub_date__lte=timezone.now(),
             choice__isnull=False,
-            )
+            ).distinct()
 
 class ResultsView(generic.DetailView):
     """Class utilizing DetailView generic view."""
@@ -49,7 +49,7 @@ class ResultsView(generic.DetailView):
         return Question.objects.filter(
             pub_date__lte=timezone.now(),
             choice__isnull=False,
-            )
+            ).distinct()
 
 def vote(request, question_id):
     """Function for voting a question."""
