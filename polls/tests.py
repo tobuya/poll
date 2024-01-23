@@ -112,6 +112,25 @@ class QuestionIndexViewTests(TestCase):
             [question2, question1],
         )
 
+    def test_questions_with_no_choices_are_unpublished(self):
+        """
+        Questions with no choices are not published
+        """
+        question = create_question(question_text="Question with no choices.", days=-3)
+        response = self.client.get(reverse("polls:index"))
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerySetEqual(
+            response.context["latest_question_list"],
+            [],
+        )
+
+    def test_questions_with_choices_are_published(self):
+        question = create_question(question_text="Question with choices.", days=-3)
+        choice = Choice.objects.create(question=question, choice_text="Choice 1")
+        response = self.client.get(reverse("polls:detail", args=(question.id,)))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, question.question_text)
+
 class QuestionDetailViewTests(TestCase):
     '''Subclass of django.test.TestCase for testing QuestionDetailView'''
     def test_future_question(self):
