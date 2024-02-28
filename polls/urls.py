@@ -1,3 +1,4 @@
+'''Importing necessary modules and classes'''
 from django.urls import path
 
 from . import views
